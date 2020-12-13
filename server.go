@@ -5,7 +5,7 @@ import (
 	"net/http"
 )
 
-func helloHandler(w http.ResponseWriter, r *http.Request) {
+func favoriteTreeHandler(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/" {
 		http.Error(w, "Bad request, please go to /", http.StatusBadRequest)
 		return
@@ -20,17 +20,17 @@ func helloHandler(w http.ResponseWriter, r *http.Request) {
 	favoriteTree := query.Get("favoriteTree")
 
 	if favoriteTree == "" {
-		http.Error(w, "Please tell me your favorite tree", http.StatusBadRequest)
+		w.WriteHeader(200)
+		w.Write([]byte("Please tell me your favorite tree"))
 		return
 	}
 
 	w.WriteHeader(200)
 	w.Write([]byte("It's nice to know that your favorite tree is a " + favoriteTree))
-
 }
 
 func main() {
-	http.HandleFunc("/", helloHandler)
+	http.HandleFunc("/", favoriteTreeHandler)
 
 	log.Println("Starting server at port 8000")
 	if err := http.ListenAndServe(":8000", nil); err != nil {
