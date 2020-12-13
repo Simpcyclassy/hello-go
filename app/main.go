@@ -1,4 +1,4 @@
-package main
+package app
 
 import (
 	"log"
@@ -7,12 +7,14 @@ import (
 
 func favoriteTreeHandler(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/" {
-		http.Error(w, "Bad request, please go to /", http.StatusBadRequest)
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte("Bad request, please go to /"))
 		return
 	}
 
 	if r.Method != "GET" {
-		http.Error(w, "404 Method not found.", http.StatusNotFound) //StatusMethodNotAllowed = 405 // RFC 7231, 6.5.5 or  http.NotFound(w, r)
+		w.WriteHeader(http.StatusNotFound)
+		w.Write([]byte("404 Method not found."))
 		return
 	}
 

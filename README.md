@@ -22,13 +22,15 @@ if not specified (e.g. a call like `127.0.0.1:8000/`):
 
 ```
 Please tell me your favorite tree
+```
 
 ## Improvements
 
-- [X] If there is no `favouriteTree` URL param return 'Please tell me your favorite tree'
-- [ ] Write tests
+- [x] If there is no `favouriteTree` URL param return 'Please tell me your favorite tree'
+- [x] Write tests
 - [ ] To use HTML templates (GO has a templating)
 - [ ] Add other end points
 - [ ] Use Go modules
 - [ ] Restructure the folder (for example a separate file for handlers)
 - [ ] Add concurrent requests
+
