@@ -24,6 +24,12 @@ if not specified (e.g. a call like `127.0.0.1:8000/`):
 Please tell me your favorite tree
 ```
 
+## Run tests
+
+```
+go test ./...
+```
+
 ## Improvements
 
 - [x] If there is no `favouriteTree` URL param return 'Please tell me your favorite tree'
@@ -33,4 +39,5 @@ Please tell me your favorite tree
 - [ ] Use Go modules
 - [ ] Restructure the folder (for example a separate file for handlers)
 - [ ] Add concurrent requests
+- [ ] Add a config and pass constants as command line arguments
 
