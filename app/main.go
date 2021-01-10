@@ -7,7 +7,7 @@ import (
 
 // struct type to capture our data
 // type WeatherCollection struct {
-// 	tempperatureValues Temperature
+// 	temperatureValues Temperature
 // 	windValues Wind
 // }
 
@@ -30,9 +30,9 @@ import (
 // And we should do tests ;)
 
 func favoriteTreeHandler(w http.ResponseWriter, r *http.Request) {
-	if r.URL.Path != "/" {
+	if r.URL.Path != "/tree" {
 		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte("Bad request, please go to /"))
+		w.Write([]byte("Bad request, please go to /tree"))
 		return
 	}
 
@@ -56,10 +56,10 @@ func favoriteTreeHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	// fileServer := http.FileServer(http.Dir("../static"))
-	// http.Handle("/", fileServer)
+	fileServer := http.FileServer(http.Dir("../client"))
+	http.Handle("/", fileServer)
 
-	http.HandleFunc("/", favoriteTreeHandler)
+	http.HandleFunc("/tree", favoriteTreeHandler)
 
 	log.Println("Starting server at port 8000")
 	if err := http.ListenAndServe(":8000", nil); err != nil {

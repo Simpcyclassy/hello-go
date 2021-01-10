@@ -34,9 +34,9 @@ go test ./...
 
 - [x] If there is no `favouriteTree` URL param return 'Please tell me your favorite tree'
 - [x] Write tests
-- [ ] To use HTML templates (GO has a templating)
-- [ ] Add other end points
-- [ ] Use Go modules
+- [x] To use HTML templates (GO has a templating)
+- [x] Add other end points
+- [x] Use Go modules
 - [ ] Restructure the folder (for example a separate file for handlers)
 - [ ] Add concurrent requests
 - [ ] Add a config and pass constants as command line arguments
