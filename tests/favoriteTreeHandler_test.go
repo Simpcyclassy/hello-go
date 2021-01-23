@@ -82,10 +82,6 @@ func TestConverter(t *testing.T) {
 			fmt.Println("tesCase:", reflect.TypeOf(testCase.message))
 			fmt.Println("body:", reflect.TypeOf(body))
 
-			// if string(body) == testCase.message {
-			// 	t.Errorf("got %v, expected %v", string(body), testCase.message)
-
-			// }
 		})
 	}
 }

@@ -1,4 +1,4 @@
-## The assigment
+## The assignment
 
 For this assignment you can use the language and environment of choice between python, go or nodejs.
 
@@ -40,4 +40,3 @@ go test ./...
 - [ ] Restructure the folder (for example a separate file for handlers)
 - [ ] Add concurrent requests
 - [ ] Add a config and pass constants as command line arguments
-
