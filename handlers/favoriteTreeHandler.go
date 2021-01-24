@@ -1,7 +1,6 @@
-package main
+package packagehandlers
 
 import (
-	"log"
 	"net/http"
 )
 
@@ -29,7 +28,7 @@ import (
 
 // And we should do tests ;)
 
-func favoriteTreeHandler(w http.ResponseWriter, r *http.Request) {
+func FavoriteTreeHandler(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/tree" {
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte("Bad request, please go to /tree"))
@@ -53,16 +52,4 @@ func favoriteTreeHandler(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(200)
 	w.Write([]byte("It's nice to know that your favorite tree is a " + favoriteTree))
-}
-
-func main() {
-	fileServer := http.FileServer(http.Dir("../client"))
-	http.Handle("/", fileServer)
-
-	http.HandleFunc("/tree", favoriteTreeHandler)
-
-	log.Println("Starting server at port 8000")
-	if err := http.ListenAndServe(":8000", nil); err != nil {
-		log.Fatal(err)
-	}
 }
