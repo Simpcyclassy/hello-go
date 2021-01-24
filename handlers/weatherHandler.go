@@ -1,4 +1,4 @@
-package weatherHandler
+package packagehandlers
 
 import (
 	"encoding/json"
@@ -66,7 +66,7 @@ func goDotEnvVariable(key string) string {
 }
 const weatherURL = "http://api.openweathermap.org/data/2.5/weather"
 
-func weatherHandler(w http.ResponseWriter, r *http.Request) {
+func WeatherHandler(w http.ResponseWriter, r *http.Request) {
 	query := r.URL.Query()
 	q := query.Get("q")
 	resp, err := http.Get(fmt.Sprintf("%s?q=%s&appid=%s", weatherURL, q, goDotEnvVariable("APP_ID")))

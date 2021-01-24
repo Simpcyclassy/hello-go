@@ -1,4 +1,4 @@
-package favoriteTreeHandler
+package packagehandlers
 
 import (
 	"net/http"
@@ -28,7 +28,7 @@ import (
 
 // And we should do tests ;)
 
-func favoriteTreeHandler(w http.ResponseWriter, r *http.Request) {
+func FavoriteTreeHandler(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/tree" {
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte("Bad request, please go to /tree"))
