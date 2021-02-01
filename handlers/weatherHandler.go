@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"time"
+
 	"github.com/joho/godotenv"
 	"github.com/rs/zerolog/log"
 )
@@ -85,7 +86,12 @@ func WeatherHandler(w http.ResponseWriter, r *http.Request) {
 	query := r.URL.Query()
 	q := query.Get("q")
 	resp, err := http.Get(fmt.Sprintf("%s?q=%s&appid=%s", weatherURL, q, goDotEnvVariable("APP_ID")))
-
+	// make a channel
+	// go routine that calls API 1 and collects results into the channel (this would be a function in a different file)
+	// make a second channel
+	// go rountine that calle API2and it collects its results into its channel
+	// wait for the two go routines before returning
+	// Above could be in a separate function (called for instance parallel)
 	if err != nil {
 		log.Info().Msg(err.Error())
 		w.WriteHeader(http.StatusInternalServerError)
