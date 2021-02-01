@@ -1,33 +1,10 @@
-package packagehandlers
+package handlers
 
 import (
 	"net/http"
 )
 
-// struct type to capture our data
-// type WeatherCollection struct {
-// 	temperatureValues Temperature
-// 	windValues Wind
-// }
-
-// type Temperature struct {
-// 	celcius int32
-// 	farenheit int32
-// }
-
-// type Wind struct {
-// 	speed int32
-// 	direction int32
-// }
-
-// func that makes a request to the API (it's probably a JSON body)
-// unmarshel the JSON to our custom struct
-
-// New handler for /weather (only serve on this path), only take get requests.
-// It should return a 200 with a json body of the WeatherCollection Data.
-
-// And we should do tests ;)
-
+// FavoriteTreeHandler handles favorite query
 func FavoriteTreeHandler(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/tree" {
 		w.WriteHeader(http.StatusBadRequest)

@@ -1,12 +1,11 @@
-package main
+package handlerstest
 
 import (
-	"fmt"
-	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
-	"reflect"
 	"testing"
+
+	"github.com/Simpcyclassy/hello-go/handlers"
 )
 
 func TestConverter(t *testing.T) {
@@ -72,16 +71,12 @@ func TestConverter(t *testing.T) {
 			req.URL.RawQuery = query.Encode() // Research this
 
 			w := httptest.NewRecorder()
-			favoriteTreeHandler(w, req)
+			handlers.FavoriteTreeHandler(w, req)
 			resp := w.Result()
 
-			body, _ := ioutil.ReadAll(resp.Body)
 			if resp.StatusCode != testCase.expectedStatusCode {
 				t.Errorf("got %v, expected %v", resp.StatusCode, testCase.expectedStatusCode)
 			}
-			fmt.Println("tesCase:", reflect.TypeOf(testCase.message))
-			fmt.Println("body:", reflect.TypeOf(body))
-
 		})
 	}
 }

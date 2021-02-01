@@ -30,6 +30,12 @@ Please tell me your favorite tree
 go test ./...
 ```
 
+## Run tests Verbose
+
+```
+go test ./... -v
+```
+
 ## Improvements
 
 - [x] If there is no `favouriteTree` URL param return 'Please tell me your favorite tree'
