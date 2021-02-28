@@ -6,20 +6,19 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
-	"strings"
 	"time"
 
 	"github.com/joho/godotenv"
 	"github.com/rs/zerolog/log"
 )
 
-// InformationResponse creates a struct for the weather body
+// InformationResponse creates a struct for the weather and covid data for a country
 type InformationResponse struct {
 	Weather     WeatherResponse
 	CovidReport CovidStats
 }
 
-// WeatherResponse creates a struct for the weather body
+// WeatherResponse creates a struct for the weather data
 type WeatherResponse struct {
 	Coord     Coords          `json:"coord"`
 	Weather   []WeatherResult `json:"weather"`
@@ -32,11 +31,15 @@ type WeatherResponse struct {
 
 // CovidStats creates a struct for covid 19 live stats
 type CovidStats struct {
-	Country        string `json:"Country"`
-	ConfirmedCases int32  `json:"Confirmed"`
-	Deaths         int32  `json:"Deaths"`
-	Recove         int32  `json:"Recovered"`
-	Active         int32  `json:"Active"`
+	Country        string `json:"country"`
+	ConfirmedCases int32  `json:"cases"`
+	TodaysCases    int32  `json:"todayCases"`
+	TotalDeaths    int32  `json:"deaths"`
+	TodaysDeaths   int32  `json:"todayDeaths"`
+	Recovered      int32  `json:"recovered"`
+	Active         int32  `json:"active"`
+	Critical       int32  `json:"critical"`
+	Tests          int32  `json:"tests"`
 }
 
 // Coords creates a struct for weather longitude and latitude
@@ -45,7 +48,7 @@ type Coords struct {
 	Lattitude float32 `json:"lat"`
 }
 
-// WeatherResult creates a struct for weather description
+// WeatherResult creates a struct for weather condition and description
 type WeatherResult struct {
 	ID          int    `json:"id"`
 	Main        string `json:"main"`
@@ -82,9 +85,9 @@ type System struct {
 func goDotEnvVariable(key string) string {
 	mydir, err := os.Getwd()
 	if err != nil {
-		fmt.Println(err)
+		log.Error().Msg(err.Error())
 	}
-	fmt.Println(mydir)
+	log.Debug().Msg(mydir)
 
 	err = godotenv.Load(".env")
 
@@ -96,89 +99,75 @@ func goDotEnvVariable(key string) string {
 }
 
 const weatherBASE = "http://api.openweathermap.org/data/2.5/weather/"
-const covidBASE = "https://api.covid19api.com/live/country"
+const covidBASE = "https://corona.lmao.ninja/v2/countries/"
 
-func checkUrls(urls []string) InformationResponse {
-	// var wg sync.WaitGroup
-	// var requestBody WeatherResponse
+func checkUrls(weatherURL, covidURL string) InformationResponse {
 
-	// for _, link := range urls {
-	// 	wg.Add(1)
-	// 	go makeWeatherRequests(link, ch)
-	// }
-	weatherChannel := make(chan WeatherResponse)
+	weatherChannel := make(chan []byte)
+	covidChannel := make(chan []byte)
+	go makeCountryInfoRequests(weatherURL, weatherChannel)
+	go makeCountryInfoRequests(covidURL, covidChannel)
+	weatherBody := <-weatherChannel
+	covidBody := <-covidChannel
 
-	go makeWeatherRequests(urls[0], weatherChannel)
-	// go func() {
-	// 	wg.Wait()
-	// 	requestBody = <-ch
-	// 	close(ch)
-	// }()
-	requestBody := <-weatherChannel
-	information := InformationResponse{}
-	information.Weather = requestBody
+	var weatherInfo WeatherResponse
+	err := json.Unmarshal(weatherBody, &weatherInfo)
+	if err != nil {
+		log.Error().Msg(err.Error())
+		return InformationResponse{}
+	}
+	weatherInfo.CreatedAt = time.Now()
+
+	var covidInfo CovidStats
+	err = json.Unmarshal(covidBody, &covidInfo)
+	if err != nil {
+		log.Error().Msg(err.Error())
+		return InformationResponse{}
+	}
+
+	var information InformationResponse
+	information.Weather = weatherInfo
+	information.CovidReport = covidInfo
 	return information
-
-	// Transformation of our result data
-	// return our data structure ready to be put in the response
 
 }
 
-func makeWeatherRequests(url string, c chan WeatherResponse) {
-	weather := WeatherResponse{}
+func makeCountryInfoRequests(url string, c chan []byte) {
+	var countryInfo []byte
 
 	resp, err := http.Get(url)
 	if err != nil {
-		log.Info().Msg(fmt.Sprintf("Error calling weather API: %s", err.Error()))
-		c <- weather
+		log.Error().Msg(fmt.Sprintf("Error calling weather API: %s", err.Error()))
+		c <- countryInfo
 		return
 	}
 
 	body, err := ioutil.ReadAll(resp.Body)
 	resp.Body.Close()
 	if err != nil {
-		log.Info().Msg(err.Error())
-		c <- weather
+		log.Error().Msg(err.Error())
+		c <- countryInfo
 		return
 	}
-
-	log.Info().Msg(fmt.Sprintf("weather: %s", body))
-
-	err = json.Unmarshal(body, &weather)
-	if err != nil {
-		log.Info().Msg(err.Error())
-		c <- weather
-		return
-	}
-	weather.CreatedAt = time.Now()
-	c <- weather
+	c <- body
 }
 
 // InformationHandler handles weather and covid requests...
 func InformationHandler(w http.ResponseWriter, r *http.Request) {
 	query := r.URL.Query()
 	q := query.Get("q")
-	live := time.Now().Add(-24 * time.Hour)
-	country := strings.ReplaceAll(q, " ", "-")
 	weatherURL := fmt.Sprintf("%s?q=%s&appid=%s", weatherBASE, q, goDotEnvVariable("APP_ID"))
-	covidURL := fmt.Sprintf("%s/%s/status/confirmed/date/%s", covidBASE, country, live)
+	covidURL := fmt.Sprintf("%s%s", covidBASE, q)
 
-	links := []string{
-		weatherURL,
-		covidURL,
-	}
+	info := checkUrls(weatherURL, covidURL)
 
-	weather := checkUrls(links)
-	// write the results to our ResponseWriter, if theres an error return this.
-	// 	w.Write(informationBody)
-
-	weatherBody, err := json.Marshal(weather)
+	informationBody, err := json.Marshal(info)
 	if err != nil {
-		log.Info().Msg(err.Error())
+		log.Error().Msg(err.Error())
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte(fmt.Sprintf("error: %s", err.Error())))
 		return
 	}
 	w.WriteHeader(http.StatusOK)
-	w.Write(weatherBody)
+	w.Write(informationBody)
 }
