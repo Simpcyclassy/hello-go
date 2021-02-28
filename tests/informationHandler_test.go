@@ -41,7 +41,7 @@ func TestWeather(t *testing.T) {
 			req.URL.RawQuery = query.Encode()
 
 			w := httptest.NewRecorder()
-			handlers.WeatherHandler(w, req)
+			handlers.InformationHandler(w, req)
 			resp := w.Result()
 
 			if resp.StatusCode != testCase.expectedStatusCode {
