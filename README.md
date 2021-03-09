@@ -36,6 +36,12 @@ go test ./...
 go test ./... -v
 ```
 
+## Run tests with coverage of all packages
+
+```
+go test -coverpkg=all ./...
+```
+
 ## Call the service with CURL
 
 ```sh
@@ -81,6 +87,12 @@ docker run -p 8000:8000 -it server-go
 - [ ] Add concurrent requests
 - [ ] Add a config and pass constants as command line arguments
 
-```
+## Notes
 
-```
+* Covid data api expects country, doesn't work with city
+* service not erroring if responses not found - will send empty body
+* panics if we return empty byte array from makeCountryInfoRequests
+    - how to recover panics and log
+    - writing checks to avoid the panic
+* showing coverage from a separate tests package
+
