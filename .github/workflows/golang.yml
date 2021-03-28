@@ -1,0 +1,42 @@
+name: Golang actions
+
+on: push
+
+jobs:
+  run-tests:
+    name: Run Go tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@master
+      - name: Setup Go
+        uses: actions/setup-go@v1
+        with:
+          go-version: '1.15'
+      - name: Run tests
+        run: go test ./...
+
+  gofmt:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - uses: actions/setup-go@v1
+        with:
+          go-version: "1.15.3"
+      - run: |
+          find . -type f -name '*.go' \
+            -execdir gofmt -d ./ \;
+
+          git diff --exit-code
+
+  go-mod-tidy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - uses: actions/setup-go@v1
+        with:
+          go-version: "1.15.3"
+      - run: |
+          find . -name go.mod | xargs dirname | xargs -I {} sh -c "cd {}; go mod tidy"
+          echo -e "\n\n\n\n\n=> The following go.mod/go.sum files require updating:\n"
+          git diff --exit-code --name-only
