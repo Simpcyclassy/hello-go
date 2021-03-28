@@ -1,9 +1,5 @@
 ## The assignment
 
-For this assignment you can use the language and environment of choice between python, go or nodejs.
-
-Note: Only use the standard library for each of the above. Third party dependencies are allowed only for testing or for development tools.
-
 ## Requirements
 
 We ask you to create a simple web server that should do the following:
@@ -84,8 +80,18 @@ docker run -p 8000:8000 -it server-go
 - [x] Add other end points
 - [x] Use Go modules
 - [x] Restructure the folder (for example a separate file for handlers)
-- [ ] Add concurrent requests
+- [x] Add concurrent requests
+
+## Next steps
+
+- [ ] Add Database / Cache
+- [ ] Get data from upstream APIs, save to DB and return to user
+- [ ] Add post/update/delete endpoints
+- [ ] Add authentication and user types (JWT)
+
 - [ ] Add a config and pass constants as command line arguments
+- [ ] Add metrics (Promethus & Grafana)
+- [ ] Run in K8s
 
 ## Notes
 

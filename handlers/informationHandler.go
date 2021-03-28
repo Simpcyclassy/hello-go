@@ -87,9 +87,9 @@ func goDotEnvVariable(key string) string {
 	if err != nil {
 		log.Error().Msg(err.Error())
 	}
-	log.Debug().Msg(mydir)
+	log.Debug().Msgf("Logs from go Dot Env %s", mydir)
 
-	err = godotenv.Load("../.env")
+	err = godotenv.Load(".env")
 
 	if err != nil {
 		log.Fatal().Msg("Error loading .env file")
@@ -136,17 +136,24 @@ func makeCountryInfoRequests(url string, c chan []byte) {
 	var countryInfo []byte
 
 	resp, err := http.Get(url)
-
-	// check the status code, react
-	if err != nil {
-		log.Error().Msg(fmt.Sprintf("Error calling weather API: %s", err.Error()))
+	if resp.StatusCode != http.StatusOK{
+		// we might want to redact sensitive information like the APP ID
+		// helper function that replaces the APP ID with ****
+		log.Error().Msg(fmt.Sprintf("Error calling API URL %s, status code: %d ", url, resp.StatusCode))
+		c <- countryInfo
+	}
+	if err != nil{
+		log.Error().Msg(fmt.Sprintf("Error calling API URL %s %s", url,err.Error()))
 		c <- countryInfo
 		return
 	}
 
-	// check if there is a response body
-
 	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Error().Msg(fmt.Sprintf("Request Body is empty: %s", err.Error()))
+		c <- countryInfo
+		return
+	}
 	resp.Body.Close()
 	if err != nil {
 		log.Error().Err(err).Msg("CHIOMA")
@@ -160,6 +167,12 @@ func makeCountryInfoRequests(url string, c chan []byte) {
 func InformationHandler(w http.ResponseWriter, r *http.Request) {
 	query := r.URL.Query()
 	q := query.Get("q")
+	if len(q) < 1 {
+		// Add metric for param to see how many people who make reuests without a query
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte("You are not passing a country param"))
+		return
+	}
 	weatherURL := fmt.Sprintf("%s?q=%s&appid=%s", weatherBASE, q, goDotEnvVariable("APP_ID"))
 	covidURL := fmt.Sprintf("%s%s", covidBASE, q)
 
