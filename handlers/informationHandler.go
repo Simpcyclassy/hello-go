@@ -87,7 +87,7 @@ func goDotEnvVariable(key string) string {
 	if err != nil {
 		log.Error().Msg(err.Error())
 	}
-	log.Debug().Msg(mydir)
+	log.Debug().Msgf("Logs from go Dot Env %s", mydir)
 
 	err = godotenv.Load(".env")
 
@@ -101,7 +101,7 @@ func goDotEnvVariable(key string) string {
 const weatherBASE = "http://api.openweathermap.org/data/2.5/weather/"
 const covidBASE = "https://corona.lmao.ninja/v2/countries/"
 
-func checkUrls(weatherURL, covidURL string) InformationResponse {
+func checkUrls(weatherURL, covidURL string) (InformationResponse, error) {
 
 	weatherChannel := make(chan []byte)
 	covidChannel := make(chan []byte)
@@ -113,22 +113,22 @@ func checkUrls(weatherURL, covidURL string) InformationResponse {
 	var weatherInfo WeatherResponse
 	err := json.Unmarshal(weatherBody, &weatherInfo)
 	if err != nil {
-		log.Error().Msg(err.Error())
-		return InformationResponse{}
+		log.Debug().Msg("Error with unmarshelling the Weather Info")
+		return InformationResponse{}, err
 	}
 	weatherInfo.CreatedAt = time.Now()
 
 	var covidInfo CovidStats
 	err = json.Unmarshal(covidBody, &covidInfo)
 	if err != nil {
-		log.Error().Msg(err.Error())
-		return InformationResponse{}
+		log.Debug().Msg("Error with unmarshelling the Covid Info")
+		return InformationResponse{}, err
 	}
 
 	var information InformationResponse
 	information.Weather = weatherInfo
 	information.CovidReport = covidInfo
-	return information
+	return information, nil
 
 }
 
@@ -136,16 +136,27 @@ func makeCountryInfoRequests(url string, c chan []byte) {
 	var countryInfo []byte
 
 	resp, err := http.Get(url)
-	if err != nil {
-		log.Error().Msg(fmt.Sprintf("Error calling weather API: %s", err.Error()))
+	if resp.StatusCode != http.StatusOK{
+		// we might want to redact sensitive information like the APP ID
+		// helper function that replaces the APP ID with ****
+		log.Error().Msg(fmt.Sprintf("Error calling API URL %s, status code: %d ", url, resp.StatusCode))
+		c <- countryInfo
+	}
+	if err != nil{
+		log.Error().Msg(fmt.Sprintf("Error calling API URL %s %s", url,err.Error()))
 		c <- countryInfo
 		return
 	}
 
 	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Error().Msg(fmt.Sprintf("Request Body is empty: %s", err.Error()))
+		c <- countryInfo
+		return
+	}
 	resp.Body.Close()
 	if err != nil {
-		log.Error().Msg(err.Error())
+		log.Error().Err(err).Msg("CHIOMA")
 		c <- countryInfo
 		return
 	}
@@ -156,16 +167,30 @@ func makeCountryInfoRequests(url string, c chan []byte) {
 func InformationHandler(w http.ResponseWriter, r *http.Request) {
 	query := r.URL.Query()
 	q := query.Get("q")
+	if len(q) < 1 {
+		// Add metric for param to see how many people who make reuests without a query
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte("You are not passing a country param"))
+		return
+	}
 	weatherURL := fmt.Sprintf("%s?q=%s&appid=%s", weatherBASE, q, goDotEnvVariable("APP_ID"))
 	covidURL := fmt.Sprintf("%s%s", covidBASE, q)
 
-	info := checkUrls(weatherURL, covidURL)
+	info, err := checkUrls(weatherURL, covidURL)
+	if err != nil {
+		// Internal record of what happened
+		log.Error().Err(err).Msg("Problem getting the data")
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte("Oops something went wrong, please try again later"))
+		return
+	}
 
 	informationBody, err := json.Marshal(info)
 	if err != nil {
-		log.Error().Msg(err.Error())
+		// Internal record of what happened
+		log.Error().Err(err).Msg("Problem with unmarshalling")
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(fmt.Sprintf("error: %s", err.Error())))
+		w.Write([]byte("Oops something went wrong, please try again later"))
 		return
 	}
 	w.WriteHeader(http.StatusOK)

@@ -12,7 +12,7 @@ func main() {
 	http.Handle("/", fileServer)
 
 	http.HandleFunc("/tree", handlers.FavoriteTreeHandler)
-	http.HandleFunc("/weather", handlers.InformationHandler)
+	http.HandleFunc("/info", handlers.InformationHandler)
 
 	log.Println("Starting server at port 8000")
 	err := http.ListenAndServe(":8000", nil)

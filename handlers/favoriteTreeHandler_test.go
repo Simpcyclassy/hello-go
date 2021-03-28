@@ -1,11 +1,9 @@
-package handlerstest
+package handlers
 
 import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
-
-	"github.com/Simpcyclassy/hello-go/handlers"
 )
 
 func TestConverter(t *testing.T) {
@@ -31,17 +29,7 @@ func TestConverter(t *testing.T) {
 			expectedStatusCode: http.StatusOK,
 		},
 		{
-			name:               "second test - wrong path",
-			method:             "GET",
-			path:               "/wrong",
-			param:              "favoriteTree",
-			message:            "Bad request, please go to /tree",
-			paramValue:         "oak",
-			expectedErr:        false,
-			expectedStatusCode: http.StatusBadRequest,
-		},
-		{
-			name:               "third test - wrong method",
+			name:               "second test - wrong method",
 			method:             "POST",
 			path:               "/tree",
 			param:              "favoriteTree",
@@ -71,7 +59,7 @@ func TestConverter(t *testing.T) {
 			req.URL.RawQuery = query.Encode() // Research this
 
 			w := httptest.NewRecorder()
-			handlers.FavoriteTreeHandler(w, req)
+			FavoriteTreeHandler(w, req)
 			resp := w.Result()
 
 			if resp.StatusCode != testCase.expectedStatusCode {
