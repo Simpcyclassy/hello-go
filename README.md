@@ -22,6 +22,8 @@ Please tell me your favorite tree
 
 ## Run tests
 
+Run these commands insi
+
 ```
 go test ./...
 ```
@@ -71,6 +73,20 @@ docker images
 ```sh
 docker run -p 8000:8000 -it server-go
 ```
+
+
+# Running with docker-compose
+
+```sh
+docker-compose up
+```
+
+stop and remove container
+
+```sh
+docker-compose down
+```
+
 
 ## Improvements
 

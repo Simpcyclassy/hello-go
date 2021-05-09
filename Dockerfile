@@ -2,7 +2,7 @@ FROM golang:1.14.0-stretch
 
 RUN mkdir /app
 
-ADD . /app
+ADD ./app /app
 
 WORKDIR /app
 
