@@ -92,6 +92,7 @@ docker run -p 8000:8000 -it server-go
 - [ ] Add a config and pass constants as command line arguments
 - [ ] Add metrics (Promethus & Grafana)
 - [ ] Run in K8s
+- [ ] Add a job that use golangci
 
 ## Notes
 
