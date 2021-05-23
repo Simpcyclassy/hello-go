@@ -4,7 +4,7 @@ services:
     build: ./app
     container_name: information_api
     ports:
-      - 8000:8000
+      - 8000:8001
 
   prometheus:
     image: prom/prometheus

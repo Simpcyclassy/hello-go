@@ -14,8 +14,8 @@ func main() {
 	http.HandleFunc("/tree", handlers.FavoriteTreeHandler)
 	http.HandleFunc("/info", handlers.InformationHandler)
 
-	log.Println("Starting server at port 8000")
-	err := http.ListenAndServe(":8000", nil)
+	log.Println("Starting server at port 8001")
+	err := http.ListenAndServe(":8001", nil)
 	if err != nil {
 		log.Fatal("ListenAndServe: ", err)
 	}
