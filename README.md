@@ -22,7 +22,7 @@ Please tell me your favorite tree
 
 ## Run tests
 
-Run these commands insi
+Run these commands in the terminal
 
 ```
 go test ./...
