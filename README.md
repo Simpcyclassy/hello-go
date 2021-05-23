@@ -22,6 +22,8 @@ Please tell me your favorite tree
 
 ## Run tests
 
+Run these commands in the terminal
+
 ```
 go test ./...
 ```
@@ -59,18 +61,25 @@ docker images
 ```
 
 ```sh
-docker run -p 8000:8000 -it server-go
-```
-
-Look for the docker images available
-
-```sh
-docker images
+docker run -p 8000:8001 -it server-go
 ```
 
 ```sh
-docker run -p 8000:8000 -it server-go
+
+docker exec -it <container-ID> bash
+
+# Running with docker-compose
+
+```sh
+docker-compose up --build
 ```
+
+stop and remove container
+
+```sh
+docker-compose down
+```
+
 
 ## Improvements
 
