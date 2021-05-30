@@ -92,6 +92,7 @@ docker run -p 8000:8000 -it server-go
 - [ ] Add a config and pass constants as command line arguments
 - [ ] Add metrics (Promethus & Grafana)
 - [ ] Run in K8s
+- [ ] Add a job that use golangci
 
 ## Notes
 
@@ -102,3 +103,13 @@ docker run -p 8000:8000 -it server-go
     - writing checks to avoid the panic
 * showing coverage from a separate tests package
 
+## Godocs
+
+You can run godocs locally to inspect package specific information.
+
+```sh
+export PATH=$PATH:$HOME/go/bin
+godoc -http=:6060
+```
+
+The docs will then be available at http://localhost:6060/pkg/github.com/Simpcyclassy/hello-go
