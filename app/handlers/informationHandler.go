@@ -31,7 +31,10 @@ func (h *informationHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	cacheBody, err := h.memCache.Get(q)
+	log.Info().Err(err).Msgf("%v is our query", q)
 	if err != nil || cacheBody == nil {
+		log.Info().Err(err).Msgf("%v direct proxy calls", cacheBody)
+
 		weatherURL := fmt.Sprintf("%s?q=%s&appid=%s", weatherBASE, q, goDotEnvVariable("APP_ID"))
 		covidURL := fmt.Sprintf("%s%s", covidBASE, q)
 
@@ -47,13 +50,27 @@ func (h *informationHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		informationBody, err = json.Marshal(info)
 		if err != nil {
 			// Internal record of what happened
-			log.Error().Err(err).Msg("Problem with unmarshalling")
+			log.Error().Err(err).Msg("Problem with marshalling")
 			w.WriteHeader(http.StatusInternalServerError)
 			w.Write([]byte("Oops something went wrong, please try again later"))
 			return
 		}
+		cacheData, err := getInterface(informationBody)
+		if err != nil {
+			// Add metric
+			log.Error().Err(err).Msg("Problem getting interface")
+		} else {
+			err := h.memCache.Set(q, cacheData)
+			log.Info().Err(err).Msgf("%v is our error. %v is our query", err, q)
+
+			if err != nil {
+				// Add metric
+				log.Error().Err(err).Msg("Problem setting cache")
+			}
+		}
 
 	} else {
+		log.Info().Msg("Taking cached response")
 		informationBody, err = getBytes(cacheBody)
 		if err != nil {
 			// Internal record of what happened
@@ -78,4 +95,11 @@ func getBytes(key interface{}) ([]byte, error) {
 		return nil, err
 	}
 	return buf.Bytes(), nil
+}
+
+func getInterface(key []byte) (interface{}, error){
+	var informationData interface{}
+	err := json.Unmarshal(key, &informationData)
+
+	return informationData, err
 }

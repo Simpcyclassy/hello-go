@@ -45,6 +45,9 @@ go test -coverpkg=all ./...
 ```sh
 curl localhost:8000/tree?favoriteTree=baobab
 ```
+```sh
+curl localhost:8000/info?q=Nigeria
+```
 
 # Running with Docker
 
