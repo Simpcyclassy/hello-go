@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/Simpcyclassy/hello-go/cache"
+	"github.com/Simpcyclassy/hello-go/app/cache"
 	"github.com/rs/zerolog/log"
 )
 

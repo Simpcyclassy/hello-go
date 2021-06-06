@@ -4,9 +4,9 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/Simpcyclassy/hello-go/cache"
-	"github.com/Simpcyclassy/hello-go/config"
-	"github.com/Simpcyclassy/hello-go/handlers"
+	"github.com/Simpcyclassy/hello-go/app/cache"
+	"github.com/Simpcyclassy/hello-go/app/config"
+	"github.com/Simpcyclassy/hello-go/app/handlers"
 )
 
 func main() {
