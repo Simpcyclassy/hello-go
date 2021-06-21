@@ -30,10 +30,11 @@ func (h *informationHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("You are not passing a country param"))
 		return
 	}
+	log.Debug().Str("memcache name", h.memCache.GetName()).Msg("memcache name in informationHandler.go")
 	cacheBody, err := h.memCache.Get(q)
-	log.Info().Err(err).Msgf("%v is our query", q)
+	log.Info().Err(err).Msgf("%v is our query, %v is our cacheBody", q, cacheBody)
 	if err != nil || cacheBody == nil {
-		log.Info().Err(err).Msgf("%v direct proxy calls", cacheBody)
+		log.Debug().Err(err).Msgf("%v direct proxy calls", cacheBody)
 
 		weatherURL := fmt.Sprintf("%s?q=%s&appid=%s", weatherBASE, q, goDotEnvVariable("APP_ID"))
 		covidURL := fmt.Sprintf("%s%s", covidBASE, q)
@@ -60,8 +61,11 @@ func (h *informationHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			// Add metric
 			log.Error().Err(err).Msg("Problem getting interface")
 		} else {
+			log.Debug().Str("memcache name", h.memCache.GetName()).Msg("memcache name in informationHandler.go where we set the memcache")
 			err := h.memCache.Set(q, cacheData)
-			log.Info().Err(err).Msgf("%v is our error. %v is our query", err, q)
+			log.Debug().Err(err).Msgf("%v is our error. %v is our query, %v is the cacheData", err, q, cacheData)
+			cacheGet, err := h.memCache.Get(q)
+			log.Debug().Msgf("%v is the cached data gotten immediatetly after setting", cacheGet)
 
 			if err != nil {
 				// Add metric
@@ -87,6 +91,8 @@ func (h *informationHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	w.Write(informationBody)
 }
 
+//convert interface to byte
+
 func getBytes(key interface{}) ([]byte, error) {
 	var buf bytes.Buffer
 	enc := gob.NewEncoder(&buf)
@@ -97,7 +103,8 @@ func getBytes(key interface{}) ([]byte, error) {
 	return buf.Bytes(), nil
 }
 
-func getInterface(key []byte) (interface{}, error){
+//convert byte to interface
+func getInterface(key []byte) (interface{}, error) {
 	var informationData interface{}
 	err := json.Unmarshal(key, &informationData)
 

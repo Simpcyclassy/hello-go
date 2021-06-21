@@ -13,7 +13,7 @@ const namespace = "hello-go"
 type Specification struct {
 	LogLevel string `split_words:"true"`
 	Memcache struct {
-		TTL       time.Duration `required:"true"`
+		TTL       time.Duration `default:"5m"`
 		Size      int64         `required:"true"`
 		Prunesize uint32        `required:"true"`
 	}

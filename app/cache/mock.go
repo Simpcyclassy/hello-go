@@ -20,6 +20,11 @@ func (m *mockedCache) Set(key string, value interface{}) error {
 	return nil
 }
 
+// Get teh name of the cache
+func (m *mockedCache) GetName() string {
+	return ""
+}
+
 // NewMockedCache creates a mocked cache just for testing
 func NewMockedCache(ttl time.Duration, maxSize int64, itemsToPrune uint32) Cache {
 	return &mockedCache{

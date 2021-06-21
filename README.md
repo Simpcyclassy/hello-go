@@ -43,10 +43,10 @@ go test -coverpkg=all ./...
 ## Call the service with CURL
 
 ```sh
-curl localhost:8000/tree?favoriteTree=baobab
+curl localhost:8001/tree?favoriteTree=baobab
 ```
 ```sh
-curl localhost:8000/info?q=Nigeria
+curl localhost:8001/info?q=Nigeria
 ```
 
 # Running with Docker
