@@ -1,8 +1,6 @@
 package handlers
 
 import (
-	"bytes"
-	"encoding/gob"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -56,7 +54,9 @@ func (h *informationHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			w.Write([]byte("Oops something went wrong, please try again later"))
 			return
 		}
-		cacheData, err := getInterface(informationBody)
+
+		var cacheData interface{}
+		err = json.Unmarshal(informationBody, &cacheData)
 		if err != nil {
 			// Add metric
 			log.Error().Err(err).Msg("Problem getting interface")
@@ -75,7 +75,9 @@ func (h *informationHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	} else {
 		log.Info().Msg("Taking cached response")
-		informationBody, err = getBytes(cacheBody)
+		informationBody, err = json.Marshal(cacheBody)
+		log.Debug().Msgf("%v is the informationBody data gotten immediatetly after taking cached body", informationBody)
+
 		if err != nil {
 			// Internal record of what happened
 			log.Error().Err(err).Msg("Error encoding to bytes buffer")
@@ -89,24 +91,4 @@ func (h *informationHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	//if not the checUrls and marshall information
 	w.WriteHeader(http.StatusOK)
 	w.Write(informationBody)
-}
-
-//convert interface to byte
-
-func getBytes(key interface{}) ([]byte, error) {
-	var buf bytes.Buffer
-	enc := gob.NewEncoder(&buf)
-	err := enc.Encode(key)
-	if err != nil {
-		return nil, err
-	}
-	return buf.Bytes(), nil
-}
-
-//convert byte to interface
-func getInterface(key []byte) (interface{}, error) {
-	var informationData interface{}
-	err := json.Unmarshal(key, &informationData)
-
-	return informationData, err
 }
